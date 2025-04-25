@@ -34,26 +34,18 @@ public class TokenService {
 		}
 	}
 
-	public String getSubject(String token) { //obtener el usuario del token
-		if (token == null) {
-			throw new RuntimeException("Token invalido");
-		}
-		DecodedJWT verifier = null;
+	public DecodedJWT decodeToken(String token) {
+		if (token == null) throw new RuntimeException("Token inválido");
+
 		try {
 			Algorithm algorithm = Algorithm.HMAC256(apiSecret);
-			verifier = JWT.require(algorithm)
+			return JWT.require(algorithm)
 					.withIssuer("smovistar")
 					.build()
 					.verify(token);
-			verifier.getSubject();
 		} catch (JWTVerificationException exception) {
-			System.out.println(exception.toString());
+			throw new RuntimeException("Token inválido o expirado");
 		}
-
-		if (verifier.getSubject() == null) {
-			throw new RuntimeException("Verifier invalido");
-		}
-		return verifier.getSubject();
 	}
 
 	private Instant generarFechaExpiracion() {

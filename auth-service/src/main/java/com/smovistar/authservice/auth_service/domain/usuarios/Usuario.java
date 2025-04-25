@@ -55,9 +55,9 @@ public class Usuario implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		if (!this.eliminado && this.estadoSuscripcion) {
-			return true;
+		if (this.eliminado && !this.estadoSuscripcion) {
+			return false;
 		}
-		return false;
+		return true;
 	}
 }

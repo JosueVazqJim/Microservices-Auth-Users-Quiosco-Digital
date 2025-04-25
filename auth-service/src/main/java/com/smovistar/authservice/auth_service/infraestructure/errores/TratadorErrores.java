@@ -2,6 +2,7 @@ package com.smovistar.authservice.auth_service.infraestructure.errores;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -50,15 +51,10 @@ public class TratadorErrores {
 		return ResponseEntity.status(400).body(new DatosError(e.getMessage()));
 	}
 
-//	@ExceptionHandler(UsuarioNoEncontradoException.class)
-//	public ResponseEntity usuarioNoEncontrado( UsuarioNoEncontradoException e) {
-//		return ResponseEntity.status(404).body(new DatosError(e.getMessage()));
-//	}
-//
-//	@ExceptionHandler(ValidacionException.class)
-//	public ResponseEntity usuarioNoEncontrado( ValidacionException e) {
-//		return ResponseEntity.status(400).body(new DatosError(e.getMessage()));
-//	}
+	@ExceptionHandler(DisabledException.class)
+	public ResponseEntity disabled( DisabledException e) {
+		return ResponseEntity.status(403).body(new DatosError(e.getMessage()));
+	}
 
 	private record DatosError(String error) {
 		public DatosError(FieldError error){

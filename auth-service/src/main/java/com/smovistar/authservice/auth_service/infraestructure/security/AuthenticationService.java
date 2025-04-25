@@ -42,7 +42,7 @@ public class AuthenticationService implements UserDetailsService {
             Boolean eliminado = document.getBoolean("eliminado");
             Boolean estadoSuscripcion = document.getBoolean("estadoSuscripcion");
             String rol = document.getString("rol");
-
+            System.out.println(document.getData());
             return new Usuario(id, email, password, eliminado, estadoSuscripcion, rol);
 
         } catch (Exception e) {
