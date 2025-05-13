@@ -25,23 +25,36 @@ public class UsuarioService {
 	}
 
 	public DatosRespuestaUsuario registrar(DatosRegistroUsuario datos) {
-
 		validadores.forEach(v -> v.validar(datos));
 
 		Usuario usuario = new Usuario(datos);
 
-		ApiFuture<DocumentReference> collectionApiFuture = dbFirestore.collection("usuarios")
-				.add(usuario);
-
 		try {
-			DocumentReference docRef = collectionApiFuture.get();
-			usuario.setId(docRef.getId());
+			// Obtener el último ID
+			DocumentReference idRef = dbFirestore.collection("config").document("lastUserId");
+			ApiFuture<DocumentSnapshot> future = idRef.get();
+			DocumentSnapshot document = future.get();
+
+			long lastId = 0;
+			if (document.exists() && document.contains("lastId")) {
+				lastId = document.getLong("lastId");
+			}
+
+			// Incrementar el ID
+			long newId = lastId + 1;
+
+			// Actualizar el último ID en Firestore
+			idRef.update("lastId", newId);
+
+			// Asignar el nuevo ID al usuario
+			usuario.setId(String.valueOf(newId));
 			dbFirestore.collection("usuarios").document(usuario.getId()).set(usuario);
+
 			return new DatosRespuestaUsuario(usuario);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("Error al registrar el usuario", e);
 		}
 	}
 
@@ -52,6 +65,8 @@ public class UsuarioService {
 
 	public DatosRespuestaUsuario actualizar(String email, DatosActualizarUsuario datos) {
 	    Usuario usuario = buscarUsuario(email);
+
+		usuarioEliminado(usuario);
 
 	    // Actualizar los campos del objeto Usuario
 	    if (datos.nombre() != null && !datos.nombre().isEmpty()) usuario.setNombre(datos.nombre());
@@ -77,7 +92,8 @@ public class UsuarioService {
 	    dbFirestore.collection("usuarios").document(usuario.getId()).set(usuario);
 
 	    return new DatosRespuestaUsuario(usuario);
-}
+	}
+
 	public void eliminar(String email) {
 		Usuario usuario = buscarUsuario(email);
 

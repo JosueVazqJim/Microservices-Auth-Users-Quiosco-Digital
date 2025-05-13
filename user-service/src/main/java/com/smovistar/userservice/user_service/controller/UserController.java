@@ -1,6 +1,5 @@
 package com.smovistar.userservice.user_service.controller;
 
-import com.google.api.gax.paging.Page;
 import com.smovistar.userservice.user_service.domain.usuario.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/usuario")
 public class UserController {
 	@Autowired
 	private UsuarioService logicaUsuario;
@@ -42,33 +40,5 @@ public class UserController {
 	public ResponseEntity<Void> eliminarUsuario(@PathVariable String email) {
 		logicaUsuario.eliminar(email);
 		return ResponseEntity.noContent().build();
-	}
-
-	@GetMapping
-	public ResponseEntity<List<DatosRespuestaUsuario>> listarUsuarios(
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size) {
-		var respuesta = logicaUsuario.obtenerUsuariosNoEliminadosSiSuscripcion(page, size);
-		return ResponseEntity.ok(respuesta);
-	}
-
-	@PutMapping("/nuevaPreferencia/{email}")
-	public  ResponseEntity<DatosRespuestaUsuario> agregarPreferencia(@PathVariable String email,
-	                                                               @RequestBody @Valid DatosPreferencias datos) {
-		var respuesta = logicaUsuario.agregarEditorialPreferida(email, datos);
-		return ResponseEntity.ok(respuesta);
-	}
-
-	@PutMapping("/eliminarPreferencia/{email}")
-	public  ResponseEntity<DatosRespuestaUsuario> eliminarPreferencia(@PathVariable String email,
-	                                                                 @RequestBody @Valid DatosPreferencias datos) {
-		var respuesta = logicaUsuario.eliminarEditorialPreferida(email, datos);
-		return ResponseEntity.ok(respuesta);
-	}
-
-	@GetMapping("/preferencias/{email}")
-	public ResponseEntity<List<String>> obtenerPreferencias(@PathVariable String email) {
-		var respuesta = logicaUsuario.obtenerEditorialesPreferentes(email);
-		return ResponseEntity.ok(respuesta);
 	}
 }
