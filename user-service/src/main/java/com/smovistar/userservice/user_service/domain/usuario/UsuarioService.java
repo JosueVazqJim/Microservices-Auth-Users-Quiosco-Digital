@@ -6,6 +6,7 @@ import com.smovistar.userservice.user_service.domain.UsuarioNoEncontradoExceptio
 import com.smovistar.userservice.user_service.domain.ValidacionException;
 import com.smovistar.userservice.user_service.domain.usuario.validaciones.registro.IValidadoresRegistroUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,17 +18,22 @@ public class UsuarioService {
 
 	private final Firestore dbFirestore;
 	private final List<IValidadoresRegistroUsuarios> validadores;
+	private final PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public UsuarioService(Firestore dbFirestore, List<IValidadoresRegistroUsuarios> validadores) {
+	public UsuarioService(Firestore dbFirestore, List<IValidadoresRegistroUsuarios> validadores, PasswordEncoder passwordEncoder) {
 		this.dbFirestore = dbFirestore;
 		this.validadores = validadores;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	public DatosRespuestaUsuario registrar(DatosRegistroUsuario datos) {
 		validadores.forEach(v -> v.validar(datos));
 
 		Usuario usuario = new Usuario(datos);
+
+		String hashedPassword = passwordEncoder.encode(datos.contrasena());
+		usuario.setContrasena(hashedPassword);
 
 		try {
 			// Obtener el último ID

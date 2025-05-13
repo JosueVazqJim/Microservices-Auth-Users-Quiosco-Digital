@@ -2,6 +2,7 @@ package com.smovistar.authservice.auth_service.infraestructure.errores;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -53,6 +54,11 @@ public class TratadorErrores {
 
 	@ExceptionHandler(DisabledException.class)
 	public ResponseEntity disabled( DisabledException e) {
+		return ResponseEntity.status(403).body(new DatosError(e.getMessage()));
+	}
+
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity badCredentials( BadCredentialsException e) {
 		return ResponseEntity.status(403).body(new DatosError(e.getMessage()));
 	}
 
